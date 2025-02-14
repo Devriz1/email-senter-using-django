@@ -1,4 +1,4 @@
-# email-senter-using-django
+# email-sender-using-Python Django
 
 This is a email sender app developed using python django 
 the key things used is:
