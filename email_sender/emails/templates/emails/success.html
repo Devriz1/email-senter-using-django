@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Sent</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* Previous styles remain the same until success-icon */
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .success-icon-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 20px;
+}
+
+/* Green Circle */
+.success-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: #28a745;
+    border-radius: 50%;
+    box-shadow: 0 3px 15px rgba(40, 167, 69, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* White Checkmark */
+.success-icon::before {
+    content: '';
+    position: absolute;
+    width: 20px;  /* Short leg */
+    height: 5px;  /* Thickness */
+    background: white;
+    top: 50%;
+    left: 30.5%;
+    transform: rotate(45deg);
+    border-radius: 2px;
+}
+
+.success-icon::after {
+    content: '';
+    position: absolute;
+    width: 40px;  /* Long leg */
+    height: 5px;  /* Thickness */
+    background: white;
+    top: 46%;
+    left: 41%;
+    transform: rotate(-45deg);
+    border-radius: 2px;
+}
+
+
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin: 20px 0;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .email-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .email {
+            color: #007bff;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div class="container">
+        <div class="success-icon-container">
+            <div class="success-icon"></div>
+        </div>
+        <h1>Email Sent Successfully! 🎉</h1>
+        <div class="email-box">
+            Your message has been sent to<br>
+            <span class="email">{{ email }}</span>
+        </div>
+        <a href="{% url 'send_email' %}" class="button">Send Another Email</a>
+    </div>
+
+    <script>
+        // Previous script remains exactly the same
+        if (typeof confetti === 'undefined') {
+            console.error('Confetti library not loaded properly');
+        }
+
+        function launchConfetti() {
+            try {
+                const count = 200;
+                const defaults = {
+                    origin: { y: 0.7 },
+                    spread: 80,
+                };
+
+                function fire(particleRatio, opts) {
+                    confetti({
+                        ...defaults,
+                        ...opts,
+                        particleCount: Math.floor(count * particleRatio)
+                    });
+                }
+
+                fire(0.25, {
+                    spread: 26,
+                    startVelocity: 55,
+                });
+
+                fire(0.2, {
+                    spread: 60,
+                });
+
+                fire(0.35, {
+                    spread: 100,
+                    decay: 0.91,
+                    scalar: 0.8
+                });
+
+                fire(0.1, {
+                    spread: 120,
+                    startVelocity: 25,
+                    decay: 0.92,
+                    scalar: 1.2
+                });
+
+                fire(0.1, {
+                    spread: 120,
+                    startVelocity: 45,
+                });
+            } catch (error) {
+                console.error('Error launching confetti:', error);
+            }
+        }
+
+        window.onload = function() {
+            // Initialize GSAP animations
+            gsap.to(".container", {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power2.out"
+            });
+
+            gsap.to(".success-icon", {
+                scale: 1,
+                duration: 0.6,
+                ease: "back.out(1.7)",
+                delay: 0.3,
+                onComplete: function() {
+                    document.querySelector('.success-icon').classList.add('pulse');
+                }
+            });
+
+            gsap.to("h1", {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                delay: 0.5
+            });
+
+            gsap.to(".email-box", {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                delay: 0.7
+            });
+
+            gsap.to(".button", {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                delay: 0.9
+            });
+
+            // Launch confetti after animations
+            setTimeout(launchConfetti, 800);
+        };
+    </script>
+</body>
+</html>
